@@ -45,7 +45,7 @@ case class PortInfo(hostPort: String, containerPort: String, isDebug: Boolean)
  * @param containerHost The container Host (name or IP) of the running service
  */
 case class ServiceInfo(serviceName: String, imageName: String, imageSource: String, ports: List[PortInfo],
-    containerId: String = "", containerHost: String = "") extends ComposeCustomTagHelpers {
+  containerId: String = "", containerHost: String = "") extends ComposeCustomTagHelpers {
   val versionTag = getTagFromImage(imageName)
 }
 
@@ -77,6 +77,7 @@ object DockerComposePlugin extends DockerComposePluginLocal {
     val composeRemoveTempFileOnShutdown = DockerComposeKeys.composeRemoveTempFileOnShutdown
     val composeContainerStartTimeoutSeconds = DockerComposeKeys.composeContainerStartTimeoutSeconds
     val composeInstanceName = DockerComposeKeys.composeInstanceName
+    val composeCaptureDockerLogs = DockerComposeKeys.composeCaptureDockerLogs
     val dockerMachineName = DockerComposeKeys.dockerMachineName
     val dockerImageCreationTask = DockerComposeKeys.dockerImageCreationTask
     val testDependenciesClasspath = DockerComposeKeys.testDependenciesClasspath
@@ -276,7 +277,9 @@ class DockerComposePluginLocal extends AutoPlugin with ComposeFile with DockerCo
       val newInstance = getRunningInstanceInfo(state, instanceName, updatedComposePath, servicesInfo)
 
       printMappedPortInformation(state, newInstance, dockerComposeVersion)
+      startLogCapture(state, newInstance, dockerComposeVersion)
       saveInstanceToSbtSession(state, newInstance)
+
     } getOrElse {
       stopLocalDockerInstance(state, instanceName, updatedComposePath)
       throw new IllegalStateException(s"Error starting Docker Compose instance. Shutting down containers...")
@@ -565,8 +568,7 @@ class DockerComposePluginLocal extends AutoPlugin with ComposeFile with DockerCo
     instanceName: String,
     serviceName: String,
     deadline: Deadline,
-    verbose: Boolean = true
-  ): Option[String] = deadline.hasTimeLeft match {
+    verbose: Boolean = true): Option[String] = deadline.hasTimeLeft match {
     case true => {
       if (verbose)
         print(s"Waiting for container Id to be available for service '$serviceName' time remaining: ${deadline.timeLeft.toSeconds}")

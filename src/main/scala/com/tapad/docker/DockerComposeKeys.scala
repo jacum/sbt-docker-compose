@@ -17,6 +17,7 @@ trait DockerComposeKeysLocal {
   val composeContainerStartTimeoutSeconds = settingKey[Int]("The amount of time in seconds to wait for the containers in a Docker Compose instance to start. Defaults to 500 seconds.")
   val dockerMachineName = settingKey[String]("If running on OSX the name of the Docker Machine Virtual machine being used. If not overridden it is set to 'default'")
   val composeInstanceName = settingKey[String]("Force instance name instead of auto-generating random one")
+  val composeCaptureDockerLogs = settingKey[Boolean]("Capture container logs into console")
   val dockerImageCreationTask = taskKey[Any]("The sbt task used to create a Docker image. For sbt-docker this should be set to 'docker.value' for the sbt-native-packager this should be set to '(publishLocal in Docker).value'.")
   val suppressColorFormatting = settingKey[Boolean]("True to suppress all color formatting in the output from the plugin. This defaults to the value of the 'sbt.log.noformat' property.")
   val testTagsToExecute = settingKey[String]("Set of ScalaTest Tags to execute when dockerComposeTest is run. Separate multiple tags by a comma. It defaults to executing all tests.")

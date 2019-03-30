@@ -29,6 +29,7 @@ trait DockerComposeSettingsLocal extends PrintFormatting {
     composeInstanceName := "default",
     composeServiceVersionTask := version.value,
     composeNoBuild := false,
+    composeCaptureDockerLogs := false,
     composeRemoveContainersOnShutdown := true,
     composeRemoveNetworkOnShutdown := true,
     composeRemoveTempFileOnShutdown := true,
@@ -55,6 +56,5 @@ trait DockerComposeSettingsLocal extends PrintFormatting {
     suppressColorFormatting := System.getProperty("sbt.log.noformat", "false") == "true",
     variablesForSubstitution := Map[String, String](),
     variablesForSubstitutionTask := Map[String, String](),
-    commands ++= Seq(dockerComposeUpCommand, dockerComposeStopCommand, dockerComposeRestartCommand, dockerComposeInstancesCommand, dockerComposeTest)
-  )
+    commands ++= Seq(dockerComposeUpCommand, dockerComposeStopCommand, dockerComposeRestartCommand, dockerComposeInstancesCommand, dockerComposeTest))
 }

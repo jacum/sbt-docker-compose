@@ -4,7 +4,7 @@ import com.tapad.docker.DockerComposeKeys._
 import sbt.{ Project, _ }
 
 import scala.collection.Seq
-import scala.sys.process.Process
+import scala.sys.process.{ Process, ProcessLogger }
 
 trait ComposeTestRunner extends SettingsHelper with PrintFormatting {
   val testDebugPortArg = "-debug"
@@ -133,4 +133,13 @@ trait ComposeTestRunner extends SettingsHelper with PrintFormatting {
       state
     }
   }
+
+  def startLogCapture(implicit state: State, instance: RunningInstanceInfo, composeVersion: Version): Unit = {
+    if (getSetting(composeCaptureDockerLogs)) {
+      val tailFlag = if (composeVersion.major > 1 || (composeVersion.major == 1 && composeVersion.minor >= 7)) "-f" else ""
+      val process = Process(s"docker-compose -p ${instance.instanceName} -f ${instance.composeFilePath} logs $tailFlag")
+      process.run(ProcessLogger(s => println(s)))
+    }
+  }
+
 }

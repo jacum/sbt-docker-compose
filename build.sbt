@@ -1,6 +1,7 @@
 import sbtrelease._
 import ReleasePlugin._
 import ReleaseStateTransformations._
+import scalariform.formatter.preferences._
 
 sbtPlugin := true
 name := "sbt-docker-compose"
@@ -32,6 +33,8 @@ libraryDependencies ++= Seq(
 publishMavenStyle := true
 publishTo := Some("Artifactory Realm" at "https://repo.dhlparcel.nl/artifactory/dhlparcel-sbt-local")
 credentials += Credentials(Path.userHome / ".sbt" / ".artifactory-credentials")
+publishConfiguration := publishConfiguration.value.withOverwrite(true)
+publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
 
 // useGpg := true
 
@@ -67,7 +70,6 @@ pomExtra := {
     </developers>
   }
 
-scalariformSettings
 
 releaseNextVersion := { (version: String) => Version(version).map(_.bumpBugfix.asSnapshot.string).getOrElse(versionFormatError) }
 
